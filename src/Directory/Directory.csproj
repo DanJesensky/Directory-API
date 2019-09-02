@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Remove="DefaultBrother.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="DefaultBrother.png" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Directory.Abstractions\Directory.Abstractions.csproj" />
+      <ProjectReference Include="..\Directory.Data\Directory.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60">
+        <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnetcore.http.abstractions\2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
+    </ItemGroup>
+
+</Project>
