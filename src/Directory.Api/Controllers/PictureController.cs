@@ -26,6 +26,11 @@ namespace Directory.Api.Controllers {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Gets a picture for a given brother.
+        /// </summary>
+        /// <param name="id">The ID of the brother to fetch the picture for.</param>
+        /// <returns>The picture of the brother, as a file (content disposition will be attachment).</returns>
         [HttpGet]
         [Route("~/Picture/{id}")]
         public IActionResult GetPicture(int id) {
@@ -39,9 +44,16 @@ namespace Directory.Api.Controllers {
                 return File(_defaultPictureProvider.GetDefaultPicture(), "image/jpeg");
             }
 
+            // TODO: I think this works for JPEG and PNG images, but need to verify.
             return File(brother.Picture, "image/jpeg");
         }
 
+        /// <summary>
+        /// Update the picture of a brother.
+        /// </summary>
+        /// <param name="brotherId">The brother whose picture to replace.</param>
+        /// <param name="picture">The picture to use as replacement.</param>
+        /// <returns>200 OK with no body if the picture was replaced.</returns>
         [HttpPost]
         [Authorize]
         [Route("~/Picture/{brotherId}")]

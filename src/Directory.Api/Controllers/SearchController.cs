@@ -15,6 +15,11 @@ namespace Directory.Api.Controllers {
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Searches the database for brothers that match the search query. At this time, only names are searched.
+        /// </summary>
+        /// <param name="query">The search query.</param>
+        /// <returns>A list of brothers that match the given query. Always returns OK, even if the list is empty.</returns>
         [HttpGet]
         [Route("~/Search/{query}")]
         public IActionResult Search(string query) {
@@ -29,12 +34,11 @@ namespace Directory.Api.Controllers {
                     && b.LastName.Contains(queries[1], StringComparison.OrdinalIgnoreCase);
             } else {
                 // If there is only one part, we look in both the first and last name for a match.
-                // Additionally, if someone puts in 3 or more criteria, we treat it the same, because it's impossible to tell
+                // Additionally, if someone puts in 3 or more criteria, we treat it the same way, because it's impossible to tell
                 // if they meant to search for "First Middle Last" or something else (especially when middle names are not stored).
                 predicate = b
                     => queries.Any(q => b.FirstName.Contains(q, StringComparison.OrdinalIgnoreCase))
                     || queries.Any(q => b.LastName.Contains(q, StringComparison.OrdinalIgnoreCase));
-
             }
 
             IEnumerable<MinimalBrother> matches =
