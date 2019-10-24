@@ -9,6 +9,9 @@ using Serilog.Sinks.SystemConsole.Themes;
 namespace Directory.Api {
     [ExcludeFromCodeCoverage]
     public static class Program {
+        /// <summary>
+        /// The template for log messages output by Serilog.
+        /// </summary>
         private const string OutputTemplate = "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}";
 
         public static void Main(string[] args) {
@@ -17,8 +20,6 @@ namespace Directory.Api {
 
         private static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                //.UseIIS()
-                //.ConfigureLogging(logging => logging.AddConsole().AddDebug().SetMinimumLevel(LogLevel.Trace))
                 .ConfigureLogging(loggingBuilder => loggingBuilder
                     .AddSerilog()
                     .AddConsole()
