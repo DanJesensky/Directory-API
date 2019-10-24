@@ -28,7 +28,7 @@ namespace Directory.Api.Controllers {
         /// <summary>
         /// Diagnostic endpoint to check that a principal is authorized.
         /// </summary>
-        /// <returns>200 OK if it got this far (AuthorizeFilter would catch it and return 401/403 if not).</returns>
+        /// <returns>204 No Content if it got this far (AuthorizeFilter would catch it and return 401/403 if not).</returns>
         [Authorize]
         [HttpGet("/authorization-check")]
         public IActionResult GetAuthorizationStatus() => NoContent();
