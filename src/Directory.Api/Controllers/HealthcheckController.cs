@@ -17,8 +17,13 @@ namespace Directory.Api.Controllers {
         /// </summary>
         /// <returns>Ok if the service is healthy, 500 Internal Server Error if there's an issue.</returns>
         [HttpGet("/healthcheck")]
-        public IActionResult GetHealthCheck() => Ok();
+        public IActionResult GetHealthcheck() {
+            if (!_healthProvider.IsDatabaseConnected()) {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to connect to database.");
+            }
 
+            return Ok();
+        }
 
         /// <summary>
         /// Diagnostic endpoint to check that a principal is authorized.
