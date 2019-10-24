@@ -16,7 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Directory.Api {
     [ExcludeFromCodeCoverage]
     public class Startup {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public Startup(IConfiguration configuration) {
             _configuration = configuration;
