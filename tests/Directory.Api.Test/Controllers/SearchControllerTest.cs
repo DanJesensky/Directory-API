@@ -1,13 +1,11 @@
-﻿using Directory.Data;
-using Moq;
+﻿using Directory.Api.Controllers;
+using Directory.Api.Models;
+using Directory.Data;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Directory.Api.Controllers;
-using Directory.Api.Models;
-using Directory.Test.Helpers;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]
@@ -16,26 +14,31 @@ namespace Directory.Api.Test.Controllers {
 
         [SetUp]
         public void SetUpMockedDbContext() {
-            Mock<DirectoryContext> mockContext = new Mock<DirectoryContext>();
+            _dbContext = new DirectoryContext(new DbContextOptionsBuilder<DirectoryContext>()
+                                              .UseInMemoryDatabase("directory")
+                                              .EnableSensitiveDataLogging()
+                                              .EnableDetailedErrors()
+                                              .Options);
+            _dbContext.Database.EnsureCreated();
 
-            mockContext
-                .SetupGet(m => m.Brother)
-                .Returns(new List<Brother> {
-                    new Brother { Id = 1, FirstName = "InactiveFirst", LastName = "InactiveLast", ExpectedGraduation = DateTime.MaxValue },
-                    new Brother { Id = 2, FirstName = "First", LastName = "Last", ExpectedGraduation = DateTime.MaxValue },
-                    new Brother { Id = 3, FirstName = "Grad", LastName = "GradLast", ExpectedGraduation = DateTime.MaxValue },
-                    new Brother { Id = 4, FirstName = "UniqueFirst", LastName = "UniqueLast" },
-                    new Brother { Id = 5, FirstName = "DuplicatedFirst1", LastName = "DuplicatedLast1" },
-                    new Brother { Id = 6, FirstName = "DuplicatedFirst2", LastName = "DuplicatedLast2" }
-                }.AsMockedDbSet());
+            _dbContext.Brother.AddRange(new[] {
+                new Brother { Id = 1, FirstName = "InactiveFirst", LastName = "InactiveLast", ExpectedGraduation = DateTime.MaxValue },
+                new Brother { Id = 2, FirstName = "First", LastName = "Last", ExpectedGraduation = DateTime.MaxValue },
+                new Brother { Id = 3, FirstName = "Grad", LastName = "GradLast", ExpectedGraduation = DateTime.MaxValue },
+                new Brother { Id = 4, FirstName = "UniqueFirst", LastName = "UniqueLast" },
+                new Brother { Id = 5, FirstName = "DuplicatedFirst1", LastName = "DuplicatedLast1" },
+                new Brother { Id = 6, FirstName = "DuplicatedFirst2", LastName = "DuplicatedLast2" }
+            });
 
-            mockContext
-                .SetupGet(m => m.InactiveBrother)
-                .Returns(new List<InactiveBrother> {
-                    new InactiveBrother { Id = 1, Reason = "Dropped out" }
-                }.AsMockedDbSet());
+            _dbContext.InactiveBrother.Add(new InactiveBrother { Id = 1, Reason = "Dropped out" });
 
-            _dbContext = mockContext.Object;
+            _dbContext.SaveChanges();
+        }
+
+        [TearDown]
+        public void TearDownDbContext() {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
 
         [Test]

@@ -1,25 +1,35 @@
-using Directory.Test.Helpers;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Directory.Data.Test {
     [TestFixture]
     public class DirectoryContextExtensionsTest {
         private DirectoryContext _dbContext;
+
         [SetUp]
         public void Setup() {
-            Mock<DirectoryContext> contextMock = new Mock<DirectoryContext>();
+            _dbContext = new DirectoryContext(new DbContextOptionsBuilder<DirectoryContext>()
+                                              .UseInMemoryDatabase("directory")
+                                              .EnableSensitiveDataLogging()
+                                              .EnableDetailedErrors()
+                                              .Options);
+            _dbContext.Database.EnsureCreated();
 
-            contextMock
-                .SetupGet(m => m.Brother)
-                .Returns(new List<Brother> {
-                    new Brother { Id = 1 },
-                    new Brother { Id = 2 }
-                }.AsMockedDbSet());
+            _dbContext.Brother.AddRange(new[] {
+                new Brother {Id = 1},
+                new Brother {Id = 2}
+            });
 
-            _dbContext = contextMock.Object;
+            _dbContext.SaveChanges();
+        }
+
+        [TearDown]
+        public void TearDownDbContext() {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
 
         [Test]

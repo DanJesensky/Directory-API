@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Directory.Api.Controllers {
     [Route("~/Brother")]
@@ -120,11 +121,9 @@ namespace Directory.Api.Controllers {
                                  brother.FirstName, brother.LastName);
             }
 
-            _dbContext.Entry(brother).CurrentValues.SetValues(newBrotherModel);
-
             try {
-                await _dbContext.SaveChangesAsync();
-            } catch (DBConcurrencyException) {
+                _dbContext.Entry(brother).CurrentValues.SetValues(newBrotherModel);
+            } catch (DbUpdateConcurrencyException) {
                 return Conflict();
             }
 

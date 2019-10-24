@@ -1,10 +1,8 @@
 ﻿using Directory.Api.Controllers;
 using Directory.Data;
-using Directory.Test.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Directory.Api.Test.Controllers {
@@ -14,21 +12,23 @@ namespace Directory.Api.Test.Controllers {
 
         [SetUp]
         public void SetUpMockedDbContext() {
-            Mock<DirectoryContext> mockContext = new Mock<DirectoryContext>();
+            _dbContext = new DirectoryContext(new DbContextOptionsBuilder<DirectoryContext>()
+                                              .UseInMemoryDatabase("directory")
+                                              .EnableSensitiveDataLogging()
+                                              .EnableDetailedErrors()
+                                              .Options);
+            _dbContext.Database.EnsureCreated();
 
-            mockContext
-                .SetupGet(m => m.Major)
-                .Returns(new List<Major> {
-                    new Major { Id = 1, Name = "Software Engineering" }
-                }.AsMockedDbSet());
+            _dbContext.Major.Add(new Major {Id = 1, Name = "Software Engineering"});
+            _dbContext.Minor.Add(new Minor { Id = 1, Name = "A minor" });
 
-            mockContext
-                .SetupGet(m => m.Minor)
-                .Returns(new List<Minor> {
-                    new Minor { Id = 1, Name = "A minor" }
-                }.AsMockedDbSet());
+            _dbContext.SaveChanges();
+        }
 
-            _dbContext = mockContext.Object;
+        [TearDown]
+        public void TearDownDbContext() {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
 
         [Test]

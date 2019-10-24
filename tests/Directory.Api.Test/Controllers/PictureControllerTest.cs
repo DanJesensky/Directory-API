@@ -1,7 +1,6 @@
 ﻿using Directory.Abstractions;
 using Directory.Api.Controllers;
 using Directory.Data;
-using Directory.Test.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
@@ -11,10 +10,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Logging;
 
 namespace Directory.Api.Test.Controllers {
@@ -24,16 +25,25 @@ namespace Directory.Api.Test.Controllers {
 
         [SetUp]
         public void SetUpDbContextMock() {
-            Mock<DirectoryContext> mockContext = new Mock<DirectoryContext>();
+            _dbContext = new DirectoryContext(new DbContextOptionsBuilder<DirectoryContext>()
+                                              .UseInMemoryDatabase("directory")
+                                              .EnableSensitiveDataLogging()
+                                              .EnableDetailedErrors()
+                                              .Options);
+            _dbContext.Database.EnsureCreated();
 
-            mockContext
-                .SetupGet(ctx => ctx.Brother)
-                .Returns(new List<Brother> {
-                    new Brother { Id = 1, Picture = new byte[] { 1, 2, 3 } },
-                    new Brother { Id = 2 }
-                }.AsMockedDbSet());
+            _dbContext.Brother.AddRange(new [] {
+                new Brother { Id = 1, Picture = new byte[] { 1, 2, 3 } },
+                new Brother { Id = 2 }
+            });
 
-            _dbContext = mockContext.Object;
+            _dbContext.SaveChanges();
+        }
+
+        [TearDown]
+        public void TearDownDbContext() {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
         }
 
         #region Get Picture
@@ -215,19 +225,26 @@ namespace Directory.Api.Test.Controllers {
 
         [Test]
         public async Task ReplacePicture_ControllerConcurrencyConflict_ReturnsConflict() {
-            Mock<DirectoryContext> mockContext = new Mock<DirectoryContext>();
+            await _dbContext.Database.EnsureDeletedAsync();
 
-            mockContext
-                .SetupGet(ctx => ctx.Brother)
-                .Returns(new List<Brother> {
-                    new Brother { Id = 1, Picture = new byte[] { 1, 2, 3 } },
-                    new Brother { Id = 2 }
-                }.AsMockedDbSet());
+            using DirectoryContext dbContext = new DirectoryContext(new DbContextOptionsBuilder<DirectoryContext>()
+                                              .UseInMemoryDatabase("directory")
+                                              .EnableSensitiveDataLogging()
+                                              .EnableDetailedErrors()
+                                              .Options);
+            await dbContext.Database.EnsureCreatedAsync();
 
-            mockContext
-                .Setup(m => m.SaveChangesAsync(default))
-                .Throws<DBConcurrencyException>();
-            
+            await dbContext.Brother.AddRangeAsync(new[] {
+                new Brother { Id = 1, Picture = new byte[] { 1, 2, 3 } },
+                new Brother { Id = 2 }
+            });
+
+            await dbContext.SaveChangesAsync();
+
+            Mock<DirectoryContext> mockedContext = new Mock<DirectoryContext>();
+            mockedContext.SetupGet(m => m.Brother).Returns(dbContext.Brother);
+            mockedContext.Setup(m => m.SaveChangesAsync(It.IsAny<CancellationToken>())).Throws<DBConcurrencyException>();
+
             ClaimsPrincipal principal = new ClaimsPrincipal(
                 new ClaimsIdentity(
                     new[] {
@@ -235,12 +252,12 @@ namespace Directory.Api.Test.Controllers {
                         new Claim(JwtClaimTypes.Subject, "1")
                     },
                     "Bearer"));
-            PictureController controller = new PictureController(mockContext.Object,
+            PictureController controller = new PictureController(mockedContext.Object,
                 Mock.Of<IDefaultPictureProvider>(),
                 principal,
                 Mock.Of<ILogger<PictureController>>());
             
-            byte[] picture = { };
+            byte[] picture = { 5 };
             IFormFile file = new FormFile(new MemoryStream(picture), 0, picture.Length, "file", "file");
             
             IActionResult result = await controller.ReplacePicture(1, file);
