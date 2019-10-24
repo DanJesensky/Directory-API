@@ -20,8 +20,6 @@ namespace Directory.Api {
 
         private static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                //.UseIIS()
-                //.ConfigureLogging(logging => logging.AddConsole().AddDebug().SetMinimumLevel(LogLevel.Trace))
                 .ConfigureLogging(loggingBuilder => loggingBuilder
                     .AddSerilog()
                     .AddConsole()
