@@ -9,6 +9,7 @@ namespace Directory {
             _dbContext = dbContext;
         }
 
+        /// <inheritdoc cref="IServiceHealthProvider.IsDatabaseConnected()"/>
         public bool IsDatabaseConnected() => _dbContext?.Database?.EnsureCreated() ?? false;
     }
 }

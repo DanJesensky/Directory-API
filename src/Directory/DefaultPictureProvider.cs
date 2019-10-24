@@ -13,6 +13,7 @@ namespace Directory {
             UpdateCachedFile();
         }
 
+        /// <inheritdoc cref="IDefaultPictureProvider.GetDefaultPicture()"/>
         public byte[] GetDefaultPicture() {
             return _cachedPicture;
         }

@@ -9,6 +9,9 @@ using Serilog.Sinks.SystemConsole.Themes;
 namespace Directory.Api {
     [ExcludeFromCodeCoverage]
     public static class Program {
+        /// <summary>
+        /// The template for log messages output by Serilog.
+        /// </summary>
         private const string OutputTemplate = "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}";
 
         public static void Main(string[] args) {
