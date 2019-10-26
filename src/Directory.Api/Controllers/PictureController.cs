@@ -58,7 +58,7 @@ namespace Directory.Api.Controllers {
         [Authorize]
         [Route("~/Picture/{brotherId}")]
         public async Task<IActionResult> ReplacePicture(int brotherId, [FromForm] IFormFile picture) {
-            string subjectId = _principal.GetSubjectId();
+            string? subjectId = _principal.GetSubjectId();
             Brother brother = await _dbContext.Brother.FindBrotherByIdAsync(brotherId);
 
             if (brother == null) {

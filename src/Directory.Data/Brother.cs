@@ -16,7 +16,7 @@ namespace Directory.Data {
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public byte[] Picture { get; set; }
+        public byte[]? Picture { get; set; }
         public DateTime? DateJoined { get; set; }
         public DateTime? DateInitiated { get; set; }
         public string ChapterDesignation { get; set; }

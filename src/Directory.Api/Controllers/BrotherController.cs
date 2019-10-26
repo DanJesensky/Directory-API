@@ -95,7 +95,7 @@ namespace Directory.Api.Controllers {
                 return BadRequest();
             }
 
-            string subject = _principal.GetSubjectId();
+            string? subject = _principal.GetSubjectId();
 
             if (string.IsNullOrEmpty(subject)) {
                 // Well, this shouldn't happen, but just to be sure.
