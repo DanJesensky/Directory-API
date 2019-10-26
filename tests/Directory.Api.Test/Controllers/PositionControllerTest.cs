@@ -1,10 +1,8 @@
 ﻿using Directory.Api.Controllers;
 using Directory.Data;
-using Directory.Test.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
+using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Directory.Api.Test.Controllers {
@@ -14,17 +12,24 @@ namespace Directory.Api.Test.Controllers {
 
         [SetUp]
         public void SetUpMockedDbContext() {
-            Mock<DirectoryContext> mockContext = new Mock<DirectoryContext>();
+            _dbContext = new DirectoryContext(new DbContextOptionsBuilder<DirectoryContext>()
+                                              .UseInMemoryDatabase("directory")
+                                              .EnableSensitiveDataLogging()
+                                              .EnableDetailedErrors()
+                                              .Options);
+            _dbContext.Database.EnsureCreated();
 
-            mockContext
-                .SetupGet(m => m.Position)
-                .Returns(new List<Position> {
-                    new Position { Id = 1, Name = "President" }
-                }.AsMockedDbSet());
+            _dbContext.Position.Add(new Position {Id = 1, Name = "President"});
 
-            _dbContext = mockContext.Object;
+            _dbContext.SaveChanges();
         }
-        
+
+        [TearDown]
+        public void TearDownDbContext() {
+            _dbContext.Database.EnsureDeleted();
+            _dbContext.Dispose();
+        }
+
         [Test]
         public void GetPositions_ReturnsListOfPositions() {
             PositionController controller = new PositionController(_dbContext);

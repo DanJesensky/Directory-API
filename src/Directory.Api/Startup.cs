@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Directory.Api {
     [ExcludeFromCodeCoverage]
@@ -23,6 +24,8 @@ namespace Directory.Api {
         }
 
         public void ConfigureServices(IServiceCollection services) {
+            services.AddLogging();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt => _configuration.Bind("JwtBearerOptions", opt));
 
@@ -41,17 +44,15 @@ namespace Directory.Api {
 
             services.AddAuthorization();
 
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            services.AddLogging();
+            services.AddControllers();
 
             services.AddDbContext<DirectoryContext>(ctxBuilder =>
                 ctxBuilder.UseMySQL(_configuration["DatabaseConnectionString"]));
 
             services.AddScoped<IServiceHealthProvider, ServiceHealthProvider>()
                     .AddScoped<ClaimsPrincipal>(provider => provider
-                                                            .GetRequiredService<IHttpContextAccessor>().HttpContext
+                                                            .GetRequiredService<IHttpContextAccessor>()
+                                                            .HttpContext
                                                             .User);
 
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -59,16 +60,19 @@ namespace Directory.Api {
             services.AddSingleton<IDefaultPictureProvider, DefaultPictureProvider>();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseHttpsRedirection();
 
-            app.UseMvc();
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

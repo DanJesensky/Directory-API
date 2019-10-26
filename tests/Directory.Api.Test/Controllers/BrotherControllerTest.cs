@@ -9,10 +9,14 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Update;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]
@@ -288,6 +292,40 @@ namespace Directory.Api.Test.Controllers {
                 Assert.That(changed, Is.Not.Null);
                 Assert.That(changed.FirstName, Is.EqualTo("firstname1"));
                 Assert.That(changed.LastName, Is.EqualTo("lastname1"));
+            }));
+        }
+
+        [Test]
+        public async Task UpdateBrother_DbConcurrencyExceptionIsThrownOnSave_ReturnsConflictAndRecordIsUnchanged() {
+            ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(new[] {
+                    new Claim(JwtClaimTypes.Scope, Constants.Scopes.Administrator),
+                    new Claim(JwtClaimTypes.Subject, "some-subject"),
+                    new Claim(JwtClaimTypes.Scope, "directory")
+                }));
+
+            int id = _dbContext.Brother.Add(new Brother { FirstName = "ShouldNot", LastName = "BeModified" }).Entity.Id;
+            await _dbContext.SaveChangesAsync();
+
+            Mock<DirectoryContext> mockedContext = new Mock<DirectoryContext>();
+            mockedContext.SetupGet(m => m.Brother).Returns(_dbContext.Brother);
+            List<IUpdateEntry> entries = new List<IUpdateEntry>(new[] { Mock.Of<IUpdateEntry>() });
+            mockedContext.Setup(m => m.Entry(It.IsAny<Brother>())).Throws(new DbUpdateConcurrencyException(string.Empty, entries));
+
+            BrotherController controller = new BrotherController(mockedContext.Object, principal, Mock.Of<ILogger<BrotherController>>());
+
+            Brother brother = new Brother {
+                Id = id,
+                FirstName = "firstname1",
+                LastName = "lastname1"
+            };
+
+            ConflictResult result = await controller.UpdateBrother(id, brother) as ConflictResult;
+            Assert.Multiple((() => {
+                Assert.That(result, Is.Not.Null);
+                Brother changed = _dbContext.Brother.FirstOrDefault(b => b.Id == id);
+                Assert.That(changed, Is.Not.Null);
+                Assert.That(changed.FirstName, Is.EqualTo("ShouldNot"));
+                Assert.That(changed.LastName, Is.EqualTo("BeModified"));
             }));
         }
 

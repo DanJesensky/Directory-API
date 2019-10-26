@@ -8,7 +8,7 @@ namespace Directory.Api.Controllers {
     public class HealthcheckController : ControllerBase {
         private readonly IServiceHealthProvider _healthProvider;
 
-        public HealthcheckController(IServiceHealthProvider healthProvider = null) {
+        public HealthcheckController(IServiceHealthProvider healthProvider) {
             _healthProvider = healthProvider;
         }
 

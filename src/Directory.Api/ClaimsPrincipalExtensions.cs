@@ -11,7 +11,7 @@ namespace Directory.Api {
         /// </summary>
         /// <param name="this">The claims principal.</param>
         /// <returns>The subject id, or null if none exists.</returns>
-        public static string GetSubjectId(this ClaimsPrincipal @this)
+        public static string? GetSubjectId(this ClaimsPrincipal @this)
             => @this.Claims
                     .FirstOrDefault(claim => claim.Type.Equals(JwtClaimTypes.Subject, StringComparison.OrdinalIgnoreCase))?
                     .Value;

@@ -15,11 +15,11 @@ namespace Directory.Test {
                 .AddInMemoryCollection()
                 .Build();
 
-            byte[] expected;
-            using (Stream stream = typeof(DefaultPictureProvider).Assembly.GetManifestResourceStream(Constants.DefaultBuiltInPictureLocation)) {
-                expected = new byte[stream.Length];
-                stream.Read(expected, 0, expected.Length);
-            }
+            using Stream stream =
+                typeof(DefaultPictureProvider).Assembly.GetManifestResourceStream(Constants.DefaultBuiltInPictureLocation);
+
+            byte[] expected = new byte[stream.Length];
+            stream.Read(expected, 0, expected.Length);
 
             DefaultPictureProvider provider = new DefaultPictureProvider(configuration);
             byte[] actual = provider.GetDefaultPicture();
@@ -41,9 +41,10 @@ namespace Directory.Test {
                     expectedFile[i] = i;
                 }
 
-                using (Stream stream = new FileStream(tempFilePath, FileMode.Open)) {
-                    stream.Write(expectedFile, 0, expectedFile.Length);
-                }
+                using Stream stream = new FileStream(tempFilePath, FileMode.Open);
+                stream.Write(expectedFile, 0, expectedFile.Length);
+                // Explicitly close the file so that the system under test can open it; normally we'd let the using directive handle it
+                stream.Close();
 
                 IConfiguration configuration = new ConfigurationBuilder()
                     .AddInMemoryCollection(new[] {
