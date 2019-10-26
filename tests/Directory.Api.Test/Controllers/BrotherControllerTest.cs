@@ -4,19 +4,16 @@ using Directory.Data;
 using IdentityModel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Update;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using Microsoft.EntityFrameworkCore.Update;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]
@@ -76,7 +73,7 @@ namespace Directory.Api.Test.Controllers {
 
         [Test]
         public void GraduatedBrothers_AreNotReturnedFromList() {
-            int id = _dbContext.Brother.Add(new Brother { FirstName = "First", LastName = "Last", ExpectedGraduation = new DateTime(1900, 1, 1) }).Entity.Id;
+            _dbContext.Brother.Add(new Brother { FirstName = "First", LastName = "Last", ExpectedGraduation = new DateTime(1900, 1, 1) });
             _dbContext.SaveChanges();
 
             BrotherController controller = new BrotherController(_dbContext, null, null);

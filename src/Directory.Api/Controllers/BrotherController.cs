@@ -1,15 +1,14 @@
-﻿using System;
-using Directory.Api.Models;
+﻿using Directory.Api.Models;
 using Directory.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 namespace Directory.Api.Controllers {
     [Route("~/Brother")]

@@ -1,10 +1,13 @@
 ﻿using Directory.Abstractions;
 using Directory.Api.Controllers;
 using Directory.Data;
+using IdentityModel;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -12,11 +15,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using IdentityModel;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.Logging;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]

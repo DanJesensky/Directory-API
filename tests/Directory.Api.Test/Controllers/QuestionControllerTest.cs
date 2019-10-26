@@ -1,11 +1,9 @@
 ﻿using Directory.Api.Controllers;
 using Directory.Data;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
+using System.Linq;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]

@@ -1,8 +1,6 @@
-using Moq;
-using NUnit.Framework;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
+using System.Threading.Tasks;
 
 namespace Directory.Data.Test {
     [TestFixture]
