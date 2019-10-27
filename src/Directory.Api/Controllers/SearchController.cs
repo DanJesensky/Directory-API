@@ -52,7 +52,7 @@ namespace Directory.Api.Controllers {
                         LastName = b.LastName
                     });
 
-            return Ok(matches);
+            return Ok(new ContentModel<MinimalBrother>(matches));
         }
     }
 }

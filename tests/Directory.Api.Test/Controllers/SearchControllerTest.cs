@@ -49,12 +49,12 @@ namespace Directory.Api.Test.Controllers {
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
 
-                IQueryable<MinimalBrother> brothers = result.Value as IQueryable<MinimalBrother>;
+                ContentModel<MinimalBrother> brothers = result.Value as ContentModel<MinimalBrother>;
                 Assert.That(brothers, Is.Not.Null);
-                Assert.That(brothers.Count(), Is.EqualTo(2));
+                Assert.That(brothers.Content.Count(), Is.EqualTo(2));
 
-                Assert.That(brothers.FirstOrDefault(b => b.Id == 5), Is.Not.Null);
-                Assert.That(brothers.FirstOrDefault(b => b.Id == 6), Is.Not.Null);
+                Assert.That(brothers.Content.FirstOrDefault(b => b.Id == 5), Is.Not.Null);
+                Assert.That(brothers.Content.FirstOrDefault(b => b.Id == 6), Is.Not.Null);
             });
         }
 
@@ -82,15 +82,15 @@ namespace Directory.Api.Test.Controllers {
             SearchController controller = new SearchController(_dbContext);
             OkObjectResult result = controller.Search(query) as OkObjectResult;
 
-            IQueryable<MinimalBrother> brothers = result?.Value as IQueryable<MinimalBrother>;
+            ContentModel<MinimalBrother> brothers = result?.Value as ContentModel<MinimalBrother>;
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
 
                 Assert.That(brothers, Is.Not.Null);
-                Assert.That(brothers.Count(), Is.GreaterThan(0));
+                Assert.That(brothers.Content.Count(), Is.GreaterThan(0));
             });
 
-            MinimalBrother brother = brothers?.FirstOrDefault();
+            MinimalBrother brother = brothers?.Content?.FirstOrDefault();
             return $"{brother?.FirstName} {brother?.LastName}";
         }
 
@@ -99,12 +99,12 @@ namespace Directory.Api.Test.Controllers {
             SearchController controller = new SearchController(_dbContext);
             OkObjectResult result = controller.Search("UniqueL UniqueF") as OkObjectResult;
 
-            IQueryable<MinimalBrother> brothers = result?.Value as IQueryable<MinimalBrother>;
+            ContentModel<MinimalBrother> brothers = result?.Value as ContentModel<MinimalBrother>;
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
 
                 Assert.That(brothers, Is.Not.Null);
-                Assert.That(brothers.Count(), Is.EqualTo(0));
+                Assert.That(brothers.Content.Count(), Is.EqualTo(0));
             });
         }
 
@@ -116,9 +116,9 @@ namespace Directory.Api.Test.Controllers {
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
 
-                IQueryable<MinimalBrother> brothers = result.Value as IQueryable<MinimalBrother>;
+                ContentModel<MinimalBrother> brothers = result.Value as ContentModel<MinimalBrother>;
                 Assert.That(brothers, Is.Not.Null);
-                Assert.That(brothers.Count(), Is.EqualTo(0));
+                Assert.That(brothers.Content.Count(), Is.EqualTo(0));
             });
         }
 
@@ -130,9 +130,9 @@ namespace Directory.Api.Test.Controllers {
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
 
-                IQueryable<MinimalBrother> brothers = result.Value as IQueryable<MinimalBrother>;
+                ContentModel<MinimalBrother> brothers = result.Value as ContentModel<MinimalBrother>;
                 Assert.That(brothers, Is.Not.Null);
-                Assert.That(brothers.Count(), Is.GreaterThan(0));
+                Assert.That(brothers.Content.Count(), Is.GreaterThan(0));
             });
         }
     }
