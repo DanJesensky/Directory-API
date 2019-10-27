@@ -70,6 +70,8 @@ namespace Directory.Api {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+
             app.UseAuthentication();
             app.UseAuthorization();
 
