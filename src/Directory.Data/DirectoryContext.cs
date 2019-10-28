@@ -4,8 +4,15 @@ using System.Diagnostics.CodeAnalysis;
 namespace Directory.Data {
     [ExcludeFromCodeCoverage]
     public partial class DirectoryContext : DbContext {
-        public DirectoryContext() { }
+        /// <summary>
+        /// Constructor for unit tests.
+        /// </summary>
+        protected DirectoryContext() { }
 
+        /// <summary>
+        /// Constructor for the database context in production situations.
+        /// </summary>
+        /// <param name="options">The options to pass to DbContext.</param>
         public DirectoryContext(DbContextOptions<DirectoryContext> options)
             : base(options) { }
 

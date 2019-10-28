@@ -1,5 +1,6 @@
 ﻿using Directory.Api.Models;
 using Directory.Data;
+using Directory.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,8 +33,8 @@ namespace Directory.Api.Controllers {
         [HttpGet]
         [AllowAnonymous]
         [Route("~/Brother")]
-        public IActionResult GetBrothers()
-            => Ok(new ContentModel<MinimalBrother>(_dbContext.Brother
+        public IActionResult GetBrothers() =>
+            Ok(new ContentModel<MinimalBrother>(_dbContext.Brother
                 // Filter out inactive brothers
                 .Where(b => !_dbContext.InactiveBrother.Any(inactive => inactive.Id == b.Id))
                 // Filter out graduated brothers
@@ -60,16 +61,36 @@ namespace Directory.Api.Controllers {
         [AllowAnonymous]
         [Route("~/Brother/{id}")]
         public async Task<IActionResult> GetBrother(int id) {
-            Brother brother = await _dbContext.Brother.FindBrotherByIdAsync(id);
+            BrotherDetailModel brother =
+                _dbContext.Brother
+                    .Include(b => b.BrotherPosition)
+                        .ThenInclude(position => position.Position)
+                    .Include(b => b.BrotherMajor)
+                        .ThenInclude(major => major.Major)
+                    .Include(b => b.BrotherMinor)
+                        .ThenInclude(minor => minor.Minor)
+                    .Include(b => b.Answer)
+                        .ThenInclude(answer => answer.Question)
+                    .Select(b => b.ToBrotherDetailModel())
+                    .FirstOrDefault(b => b.Id == id);
 
             if (brother == null) {
                 return NotFound();
             }
 
-            // Shouldn't send down the picture.
-            // This isn't an issue since SaveChanges/SaveChangesAsync aren't called.
-            // TODO: This probably shouldn't just be null on every fetch, but it's not a big deal right now.
-            brother.Picture = null;
+            // Add the little brothers and big brother. Could do this via EFCore for the big brother with some effort,
+            // but not the little brothers. It can't do the query in the reverse as far as I can tell.
+            brother.BigBrother = _dbContext
+                .Brother
+                .Include(b => b.InactiveBrother)
+                .FirstOrDefault(big => big.Id == _dbContext.Brother.First(b => b.Id == brother.Id).BigBrotherId)?
+                .ToRelatedBrotherModel();
+
+            brother.LittleBrothers = _dbContext
+                .Brother
+                .Include(b => b.InactiveBrother)
+                .Where(b => b.BigBrotherId == brother.Id)
+                .Select(b => b.ToRelatedBrotherModel());
 
             return Ok(brother);
         }

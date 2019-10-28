@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Directory.Data.Models;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]
@@ -174,7 +175,7 @@ namespace Directory.Api.Test.Controllers {
             await _dbContext.SaveChangesAsync();
 
             BrotherController controller = new BrotherController(_dbContext, null, null);
-            Brother result = ((OkObjectResult)await controller.GetBrother(id)).Value as Brother;
+            BrotherDetailModel result = ((OkObjectResult) await controller.GetBrother(id)).Value as BrotherDetailModel;
 
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
@@ -191,7 +192,7 @@ namespace Directory.Api.Test.Controllers {
             await _dbContext.SaveChangesAsync();
 
             BrotherController controller = new BrotherController(_dbContext, null, null);
-            Brother result = ((OkObjectResult)await controller.GetBrother(id)).Value as Brother;
+            BrotherDetailModel result = ((OkObjectResult) await controller.GetBrother(id)).Value as BrotherDetailModel;
 
             Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
