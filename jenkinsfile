@@ -1,0 +1,48 @@
+pipeline{
+    agent any
+
+    environment{
+        DOTNET_CLI_TELEMETRY_OPTOUT = 1;
+        GITHUB_ACCESS_TOKEN = credentials("GitHub-Access-Token");
+    }
+
+    stages{
+        stage("Clean"){
+            steps{
+                sh 'dotnet clean'
+            }
+        }
+
+        stage("Restore"){
+            steps{
+                sh 'dotnet restore'
+            }
+        }
+
+        stage("Build"){
+            steps{
+                sh 'dotnet build --no-restore --no-incremental'
+            }
+        }
+
+        stage("Test"){
+            steps{
+                sh 'dotnet test --no-build'
+            }
+        }
+    }
+    post{
+        success{
+            sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
+                -H "Content-Type: application/json" \
+                -X POST \
+                -d "{\\"state\\": \\"success\\",\\"context\\": \\"continuous-integration/jenkins\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
+        }
+        failure{
+            sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
+                -H "Content-Type: application/json" \
+                -X POST \
+                -d "{\\"state\\": \\"failure\\",\\"context\\": \\"continuous-integration/jenkins\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
+        }
+    }
+}
