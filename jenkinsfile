@@ -32,6 +32,9 @@ pipeline{
         }
     }
     post{
+        always{
+            sh 'dotnet clean'
+        }
         success{
             sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
                 -H "Content-Type: application/json" \
