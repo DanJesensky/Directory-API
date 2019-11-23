@@ -23,29 +23,45 @@ pipeline{
             steps{
                 sh 'dotnet build --no-restore --no-incremental'
             }
+            post{
+                success{
+                    sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        -X POST \
+                        -d "{\\"state\\": \\"success\\",\\"context\\": \\"Jenkins Build\\", \\"description\\": \\"Build Succeeded\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
+                }
+                failure{
+                    sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        -X POST \
+                        -d "{\\"state\\": \\"failure\\",\\"context\\": \\"Jenkins Build\\", \\"description\\": \\"Build Failed\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
+                }
+            }
         }
 
         stage("Test"){
             steps{
                 sh 'dotnet test --no-build'
             }
+            post{
+                success{
+                    sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        -X POST \
+                        -d "{\\"state\\": \\"success\\",\\"context\\": \\"Jenkins Tests\\", \\"description\\": \\"Tests Passed\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
+                }
+                failure{
+                    sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
+                        -H "Content-Type: application/json" \
+                        -X POST \
+                        -d "{\\"state\\": \\"failure\\",\\"context\\": \\"Jenkins Tests\\", \\"description\\": \\"Tests Failed\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
+                }
+            }
         }
     }
     post{
         always{
             sh 'dotnet clean'
-        }
-        success{
-            sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
-                -H "Content-Type: application/json" \
-                -X POST \
-                -d "{\\"state\\": \\"success\\",\\"context\\": \\"Jenkins CI\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
-        }
-        failure{
-            sh 'curl "https://api.GitHub.com/repos/DanJesensky/Directory-API/statuses/$GIT_COMMIT?access_token=$GITHUB_ACCESS_TOKEN" \
-                -H "Content-Type: application/json" \
-                -X POST \
-                -d "{\\"state\\": \\"failure\\",\\"context\\": \\"Jenkins CI\\", \\"description\\": \\"Jenkins\\", \\"target_url\\": \\"https://ci.danjesensky.com/job/Directory%20API/$BUILD_NUMBER/console\\"}"'
         }
     }
 }
