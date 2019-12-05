@@ -357,5 +357,28 @@ namespace Directory.Api.Test.Controllers {
         }
 
         #endregion Tests for POST /Brother/Id
+
+        [Test]
+        public async Task GetMinimalBrothers_ReturnsMinimalInfoOnAllBrothers() {
+            await _dbContext.Brother.AddRangeAsync(new[] {
+                new Brother {Id = 1, FirstName = "First1", LastName = "Last1"},
+                new Brother {Id = 2, FirstName = "First2", LastName = "Last2"}
+            });
+            await _dbContext.InactiveBrother.AddAsync(new InactiveBrother {Id = 2, Reason = "something"});
+            await _dbContext.SaveChangesAsync();
+
+            BrotherController controller = new BrotherController(_dbContext, null, null);
+            OkObjectResult result = controller.GetMinimalBrothers() as OkObjectResult;
+
+            Assert.Multiple((() => {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Value, Is.Not.Null);
+
+                IdNameModel[] content = (result.Value as ContentModel<IdNameModel>)?.Content.ToArray();
+                Assert.That(content, Is.Not.Null);
+                Assert.That(content![0].Name, Is.EqualTo("First1 Last1"));
+                Assert.That(content![1].Name, Is.EqualTo("First2 Last2"));
+            }));
+        }
     }
 }

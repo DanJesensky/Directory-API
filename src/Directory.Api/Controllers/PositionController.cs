@@ -1,8 +1,8 @@
-﻿using Directory.Data;
+﻿using Directory.Api.Models;
+using Directory.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Directory.Api.Controllers {
-    [Route("api/[controller]")]
     [ApiController]
     public class PositionController : ControllerBase {
         private readonly DirectoryContext _dbContext;
@@ -17,6 +17,6 @@ namespace Directory.Api.Controllers {
         /// <returns>The list of active positions.</returns>
         [HttpGet]
         [Route("~/Position")]
-        public IActionResult GetPositions() => Ok(_dbContext.Position);
+        public IActionResult GetPositions() => Ok(new ContentModel<Position>(_dbContext.Position));
     }
 }

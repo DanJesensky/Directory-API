@@ -1,9 +1,12 @@
-﻿using Directory.Api.Controllers;
+﻿using System.Collections;
+using System.Collections.Generic;
+using Directory.Api.Controllers;
 using Directory.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System.Linq;
+using Directory.Api.Models;
 
 namespace Directory.Api.Test.Controllers {
     [TestFixture]
@@ -38,7 +41,7 @@ namespace Directory.Api.Test.Controllers {
             Assert.Multiple((() => {
                 Assert.That(result, Is.Not.Null);
 
-                IQueryable<Major> value = result.Value as IQueryable<Major>;
+                Major[] value = (result.Value as ContentModel<Major>)?.Content.ToArray();
                 Assert.That(value, Is.Not.Null);
                 Assert.That(value.Count(), Is.GreaterThan(0));
                 Assert.That(value.FirstOrDefault(major => major.Id == 1)?.Name, 
@@ -53,7 +56,7 @@ namespace Directory.Api.Test.Controllers {
             Assert.Multiple((() => {
                 Assert.That(result, Is.Not.Null);
 
-                IQueryable<Minor> value = result.Value as IQueryable<Minor>;
+                Minor[] value = (result.Value as ContentModel<Minor>)?.Content.ToArray();
                 Assert.That(value, Is.Not.Null);
                 Assert.That(value.Count(), Is.GreaterThan(0));
                 Assert.That(value.FirstOrDefault(minor => minor.Id == 1)?.Name,

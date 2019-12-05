@@ -4,7 +4,7 @@ namespace Directory.Data {
     public partial class Answer {
         public AnswerModel ToAnswerModel() =>
             new AnswerModel {
-                QuestionId = Question.Id,
+                Id = Question.Id,
                 Question = Question.QuestionText,
                 Answer = AnswerText
             };
