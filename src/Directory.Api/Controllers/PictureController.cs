@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ namespace Directory.Api.Controllers {
         /// Gets a picture for a given brother.
         /// </summary>
         /// <param name="id">The ID of the brother to fetch the picture for.</param>
-        /// <returns>The picture of the brother, as a file (content disposition will be attachment).</returns>
+        /// <returns>The picture of the brother, as a file (content disposition will be inline).</returns>
         [HttpGet]
         [Route("~/Picture/{id}")]
         public IActionResult GetPicture(int id) {
@@ -41,12 +42,17 @@ namespace Directory.Api.Controllers {
             }
 
             if (brother.Picture == null) {
-                return File(_defaultPictureProvider.GetDefaultPicture(), "image/jpeg");
+                return GetDefaultPicture();
             }
 
             // TODO: I think this works for JPEG and PNG images, but need to verify.
             return File(brother.Picture, "image/jpeg");
         }
+
+        [HttpGet]
+        [Route("~/Picture/Default")]
+        public IActionResult GetDefaultPicture() =>
+            File(_defaultPictureProvider.GetDefaultPicture(), MediaTypeNames.Image.Jpeg);
 
         /// <summary>
         /// Update the picture of a brother.

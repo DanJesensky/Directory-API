@@ -370,15 +370,18 @@ namespace Directory.Api.Test.Controllers {
             BrotherController controller = new BrotherController(_dbContext, null, null);
             OkObjectResult result = controller.GetMinimalBrothers() as OkObjectResult;
 
-            Assert.Multiple((() => {
+            Assert.Multiple(() => {
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Value, Is.Not.Null);
 
                 IdNameModel[] content = (result.Value as ContentModel<IdNameModel>)?.Content.ToArray();
                 Assert.That(content, Is.Not.Null);
+                Assert.That(content![0].Id == 1);
                 Assert.That(content![0].Name, Is.EqualTo("First1 Last1"));
+
+                Assert.That(content![1].Id == 2);
                 Assert.That(content![1].Name, Is.EqualTo("First2 Last2"));
-            }));
+            });
         }
     }
 }

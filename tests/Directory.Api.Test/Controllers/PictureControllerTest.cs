@@ -87,6 +87,25 @@ namespace Directory.Api.Test.Controllers {
 
         #endregion Get Picture
 
+        #region Get Default Picture
+
+        [Test]
+        public void GetDefaultPicture_ReturnsDefaultPicture() {
+            Mock<IDefaultPictureProvider> mockDefaultProvider = new Mock<IDefaultPictureProvider>();
+            mockDefaultProvider.Setup(m => m.GetDefaultPicture()).Returns(new byte[] { 7, 7, 7 });
+            PictureController controller = new PictureController(_dbContext, mockDefaultProvider.Object, null, null);
+            FileContentResult result = controller.GetDefaultPicture() as FileContentResult;
+
+            Assert.Multiple(() => {
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.FileContents, Is.Not.Null);
+                Assert.That(result.ContentType, Is.EqualTo("image/jpeg"));
+                Assert.That(result.FileContents, Is.EqualTo(new byte[] { 7, 7, 7 }));
+            });
+        }
+
+        #endregion Get Default Picture
+
         #region Update Picture
 
         [Test]
