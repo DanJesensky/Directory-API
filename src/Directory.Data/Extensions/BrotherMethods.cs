@@ -18,7 +18,8 @@ namespace Directory.Data {
                 Majors = BrotherMajor.Select(major => major.ToBrotherStudyModel()),
                 Minors = BrotherMinor.Select(minor => minor.ToBrotherStudyModel()),
                 Questions = Answer.Select(answer => answer.ToAnswerModel()),
-                Positions = BrotherPosition.Select(position => position.ToPositionHeldModel())
+                Positions = BrotherPosition.Select(position => position.ToPositionHeldModel()),
+                Visible = InactiveBrother == null
             };
 
         public RelatedBrotherModel ToRelatedBrotherModel() =>
@@ -27,7 +28,7 @@ namespace Directory.Data {
                 Name = $"{FirstName} {LastName}",
                 // If an InactiveBrother record exists, the link should not be visible.
                 // Alternatively, if the DateJoined is null, that means it's a dummy record just to show the name.
-                Viewable = InactiveBrother == null && DateJoined != null
+                Visible = InactiveBrother == null && DateJoined != null
             };
     }
 }

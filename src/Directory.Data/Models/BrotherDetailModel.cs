@@ -19,5 +19,6 @@ namespace Directory.Data.Models {
         public IEnumerable<BrotherStudyModel> Majors { get; set; }
         public IEnumerable<BrotherStudyModel> Minors { get; set; }
         public IEnumerable<RelatedBrotherModel> LittleBrothers { get; set; }
+        public bool Visible { get; set; }
     }
 }

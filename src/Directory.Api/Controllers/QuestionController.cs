@@ -1,8 +1,8 @@
-﻿using Directory.Data;
+﻿using Directory.Api.Models;
+using Directory.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Directory.Api.Controllers {
-    [Route("api/[controller]")]
     [ApiController]
     public class QuestionController : ControllerBase
     {
@@ -16,6 +16,7 @@ namespace Directory.Api.Controllers {
         /// Returns a list of prompts that brothers may have answered.
         /// </summary>
         /// <returns>The list of prompts.</returns>
-        public IActionResult GetQuestions() => Ok(_dbContext.Question);
+        [Route("~/Question")]
+        public IActionResult GetQuestions() => Ok(new ContentModel<Question>(_dbContext.Question));
     }
 }

@@ -143,11 +143,24 @@ namespace Directory.Api.Controllers {
 
             try {
                 _dbContext.Entry(brother).CurrentValues.SetValues(newBrotherModel);
+
+                await _dbContext.SaveChangesAsync();
             } catch (DbUpdateConcurrencyException) {
                 return Conflict();
             }
 
             return Ok();
         }
+
+        /// <summary>
+        /// Returns a list of brothers with minimal information (only id and full name).
+        ///
+        /// Note that this includes all brothers, not just active ones.
+        /// </summary>
+        /// <returns>A list of all brothers with only their names and IDs.</returns>
+        [HttpGet]
+        [Route("~/Brother/Minimal")]
+        public IActionResult GetMinimalBrothers() =>
+            Ok(new ContentModel<IdNameModel>(_dbContext.Brother.Select(b => new IdNameModel { Id = b.Id, Name = $"{b.FirstName} {b.LastName}" })));
     }
 }
