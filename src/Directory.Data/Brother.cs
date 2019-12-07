@@ -24,7 +24,7 @@ namespace Directory.Data {
         public DateTime? ExpectedGraduation { get; set; }
         public int BigBrotherId { get; set; }
 
-        public virtual InactiveBrother InactiveBrother { get; set; }
+        public virtual InactiveBrother? InactiveBrother { get; set; }
         public virtual ICollection<Answer> Answer { get; set; }
         public virtual ICollection<BrotherExtracurricular> BrotherExtracurricular { get; set; }
         public virtual ICollection<BrotherMajor> BrotherMajor { get; set; }

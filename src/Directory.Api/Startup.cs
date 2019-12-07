@@ -33,7 +33,9 @@ namespace Directory.Api {
                 authorizationBuilder
                     .AddPolicy(Constants.AuthorizationPolicies.DefaultPolicy,
                         policyBuilder => 
-                            policyBuilder.RequireClaim(JwtClaimTypes.Subject));
+                            policyBuilder
+                                .RequireAuthenticatedUser()
+                                .RequireClaim(JwtClaimTypes.Subject));
 
                 authorizationBuilder.DefaultPolicy = authorizationBuilder.GetPolicy(Constants.AuthorizationPolicies.DefaultPolicy);
             });
@@ -41,8 +43,6 @@ namespace Directory.Api {
             // JwtSecurityTokenHandler by default maps some OAuth 2.0 claims to long WS-style claims.
             // Clearing this map prevents that. https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet/issues/415
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-            services.AddAuthorization();
 
             services.AddControllers();
 

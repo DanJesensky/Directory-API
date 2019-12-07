@@ -143,6 +143,8 @@ namespace Directory.Api.Controllers {
 
             try {
                 _dbContext.Entry(brother).CurrentValues.SetValues(newBrotherModel);
+
+                await _dbContext.SaveChangesAsync();
             } catch (DbUpdateConcurrencyException) {
                 return Conflict();
             }
